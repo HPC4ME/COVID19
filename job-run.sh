@@ -25,63 +25,63 @@ structure=
 # Run our simulations
 
 for i in {1..8}; do
+(
+  mkdir run$i
+  cd ./run$i
 
-mkdir run$i
-cd ./run$i
+  mkdir EM$i
+  cd ./EM$i
 
-mkdir EM$i
-cd ./EM$i
+  gmx grompp -f ../../mdp-files/em.mdp -c ../../$structure -r ../../$structure -p ../../topol.top -o em.tpr  -maxwarn 5
+  srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s em.tpr -c mpro-em.gro
 
-gmx grompp -f ../../mdp-files/em.mdp -c ../../$structure -r ../../$structure -p ../../topol.top -o em.tpr  -maxwarn 5
-srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s em.tpr -c mpro-em.gro
-
-cd ../../
-
+  cd ../../
+)&
 done
 
 wait
 
 for i in {1..8}; do
+(
+  cd ./run$i
+  mkdir NVT$i
+  cd ./NVT$i
 
-cd ./run$i
-mkdir NVT$i
-cd ./NVT$i
+  gmx grompp -f ../../mdp-files/nvt.mdp -c ../EM$i/mpro-em.gro -r ../EM$i/mpro-em.gro -p ../../topol.top -o nvt.tpr -maxwarn 5
+  srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s nvt.tpr -c mpro-nvt.gro
 
-gmx grompp -f ../../mdp-files/nvt.mdp -c ../EM$i/mpro-em.gro -r ../EM$i/mpro-em.gro -p ../../topol.top -o nvt.tpr -maxwarn 5
-srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s nvt.tpr -c mpro-nvt.gro
-
-cd ../../
-
+  cd ../../
+)&
 done
 
 wait
 
 for i in {1..8}; do
+(
+  cd ./run$i
+  mkdir NPT$i
+  cd ./NPT$i
 
-cd ./run$i
-mkdir NPT$i
-cd ./NPT$i
+  gmx grompp -f ../../mdp-files/npt.mdp -c ../NVT$i/mpro-nvt.gro -r ../NVT$i/mpro-nvt.gro -p ../../topol.top -o npt.tpr -maxwarn 5
+  srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s npt.tpr -c mpro-npt.gro
 
-gmx grompp -f ../../mdp-files/npt.mdp -c ../NVT$i/mpro-nvt.gro -r ../NVT$i/mpro-nvt.gro -p ../../topol.top -o npt.tpr -maxwarn 5
-srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s npt.tpr -c mpro-npt.gro
-
-cd ../../
-
+  cd ../../
+)&
 done
 
 wait
 
 for i in {1..8}; do
+(
+  cd ./run$i
+  mkdir MD$i
+  cd ./MD$i
 
-cd ./run$i
-mkdir MD$i
-cd ./MD$i
+  gmx grompp -f ../../mdp-files/md.mdp -c ../NPT$i/mpro-npt.gro -r ../NPT$i/mpro-npt.gro -p ../../topol.top -o md$i.tpr -maxwarn 5
+  srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s md$i.tpr -c done-$structure &
 
-gmx grompp -f ../../mdp-files/md.mdp -c ../NPT$i/mpro-npt.gro -r ../NPT$i/mpro-npt.gro -p ../../topol.top -o md$i.tpr -maxwarn 5
-srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s md$i.tpr -c done-$structure &
-
-cd ../../
-
+  cd ../../
+)&
 done
 
 wait
