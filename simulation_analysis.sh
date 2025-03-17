@@ -84,7 +84,7 @@ done
 #Compute the final average
 if [[ $count -gt 0 ]]; then
     total_avg=$(echo "$sum / $count" | bc -l)
-        echo "The total average movement of your ligands across all runs is $total_avg nm" > "$output_file"
+        echo "The total average movement of your drug across all runs is $total_avg nm" > "$output_file"
     echo "Average ligand movement saved to $output_file"
     cat $output_file
 else
