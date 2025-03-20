@@ -78,7 +78,7 @@ for i in {1..8}; do
   cd ./MD$i
 
   gmx grompp -f ../../mdp-files/md.mdp -c ../NPT$i/mpro-npt.gro -r ../NPT$i/mpro-npt.gro -p ../../topol.top -o md$i.tpr -maxwarn 5
-  srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s md$i.tpr -c done-$structure &
+  srun --nodes=1 --ntasks=16 --cpus-per-task=1 --exact --mem=24000M gmx_mpi mdrun -s md$i.tpr -c done-$structure
 
   cd ../../
 )&
