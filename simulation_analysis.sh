@@ -55,6 +55,8 @@ done
 
 for i in {1..8}; do
 
+gmx trjconv -f ./run$i/MD$i/*.xtc -o ./run$i/MD$i/nojump-traj$i.xtc -pbc nojump
+
 echo -e "13 13" | gmx rms -s ./run$i/MD$i/*.tpr -f ./run$i/MD$i/*.xtc -o ./analysis/rmsd_run$i.xvg
 
 done
